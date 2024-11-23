@@ -1,9 +1,5 @@
-import org.junit.Test;
-import static org.junit.Assert.*;
-public class HelloWorldTest {
-    @Test
-    public void testOutput() {
-        // Simulate the expected output
-        assertEquals("Hello, GitHub Actions!", "Hello, GitHub Actions!");
+public class LoginPage {
+    public static void main(String[] args) {
+        System.out.println("Hello, GitHub Actions!");
     }
 }
