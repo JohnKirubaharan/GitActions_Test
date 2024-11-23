@@ -4,6 +4,9 @@ on:
   pull_request:
     branches:
       - develop
+    paths:
+      - 'feature/Build/**'
+      - 'feature/Test/**'
 
 jobs:
   build:
