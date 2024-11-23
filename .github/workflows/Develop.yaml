@@ -34,20 +34,21 @@ jobs:
         git fetch --prune --unshallow
     
         # Change to the Build folder if it exists
-        if [ -d Build ]; then
-            cd Build
+        if [ -d "feature/Build" ]; then
+            cd feature/Build
+            
+            # Find and list changed Java files
+            git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.java$' > ../../changed_files.txt
+            
+            echo "Before SHA: ${{ github.event.before }}"
+            echo "After SHA: ${{ github.sha }}"
         else
             echo "Build directory does not exist."
             exit 1
         fi
-    
-        # Find changed Java files
-        git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.java$' > ../changed_files.txt
-        echo "Before SHA: ${{ github.event.before }}"
-        echo "After SHA: ${{ github.sha }}"
         
         # Return to the root directory
-        cd ..
+        cd ../../
     
         # Handle case where no files are found
         if [ ! -s ../changed_files.txt ]; then
@@ -55,6 +56,8 @@ jobs:
             exit 0
         fi
         echo "CHANGED_FILES=$(cat changed_files.txt)" >> $GITHUB_ENV
+        echo "Changed files:"
+        cat changed_files.txt
     
 
         
