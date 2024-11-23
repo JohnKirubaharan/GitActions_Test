@@ -51,7 +51,6 @@ jobs:
             echo "No Java files changed."
             exit 0
         fi
-    
         echo "CHANGED_FILES=$(cat changed_files.txt)" >> $GITHUB_ENV
     
 
