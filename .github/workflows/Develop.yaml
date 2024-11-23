@@ -43,7 +43,7 @@ jobs:
 
     - name: Build and test changed files
       if: env.CHANGED_FILES != ''
-        run: |
+      run: |
           BUILD_STATUS="Pass" # Initialize build status as Pass
           for file in $(cat changed_files.txt); do
             echo "Processing $file..."
@@ -69,8 +69,8 @@ jobs:
           echo "BUILD_STATUS=$BUILD_STATUS" >> $GITHUB_ENV
   
 
-     - name: Report build status
-        run: |
-          echo "Build Status: $BUILD_STATUS"
-        env:
-          BUILD_STATUS: ${{ env.BUILD_STATUS }}
+    - name: Report build status
+      run: |
+        echo "Build Status: $BUILD_STATUS"
+      env:
+        BUILD_STATUS: ${{ env.BUILD_STATUS }}
