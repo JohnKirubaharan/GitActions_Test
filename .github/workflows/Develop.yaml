@@ -25,53 +25,52 @@ jobs:
     - name: Run tests
       run: mvn test
 
-    - name: Compile and run
+    - name: Get changed Java files in Build Folder
+      id: changed-files
       run: |
-        javac HelloWorld.java
-        java HelloWorld
+        # Change to the Build Folder
+        cd BuildFolder || exit
+        # Find all changed Java files
+        git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.java$' > ../changed_files.txt
+        # Return to the root directory
+        cd ..
+        echo "CHANGED_FILES=$(cat changed_files.txt)" >> $GITHUB_ENV
 
-  auto-merge:
-    needs: build
-    if: success()
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Auto-merge pull request
-      env:
-        GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+    - name: Print changed files
       run: |
-        if [ "${{ github.event.pull_request.merged }}" != "true" ]; then
-          gh pr merge ${{ github.event.pull_request.number }} --merge --admin -m
-        fi
+        echo "Changed files:"
+        cat changed_files.txt
 
-  issue-status-change:
-    needs: build
-    if: success()
-    runs-on: ubuntu-latest
+    - name: Build and test changed files
+      if: env.CHANGED_FILES != ''
+        run: |
+          BUILD_STATUS="Pass" # Initialize build status as Pass
+          for file in $(cat changed_files.txt); do
+            echo "Processing $file..."
+            # Change to the Build Folder
+            cd BuildFolder || exit
+            # Compile the Java file
+            if ! javac "$file"; then
+              echo "Compilation failed for $file"
+              BUILD_STATUS="Fail"
+              break
+            fi
+            # Extract class name by stripping directory and extension
+            classname=$(basename "$file" .java)
+            # Run the compiled class file
+            if ! java "$classname"; then
+              echo "Execution failed for $classname"
+              BUILD_STATUS="Fail"
+              break
+            fi
+            # Return to the root directory
+            cd ..
+          done
+          echo "BUILD_STATUS=$BUILD_STATUS" >> $GITHUB_ENV
+  
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
-
-    - name: Set Pull Request Number
-      run: echo "PR_NUMBER=${{ github.event.pull_request.number }}" >> $GITHUB_ENV
-      
-    - name: Extract Linked Issue URL
-      env:
-        GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      run: |
-        ISSUE_URL=$(gh pr view "$PR_NUMBER" --repo "$GITHUB_REPOSITORY" --json body --jq '.body' | grep -o 'https://github.com/.*/issues/[0-9]*')
-          echo "Issue URL: $ISSUE_URL"
-
-    - name: Move linked issue to Ready
-      env:
-        GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-      run: |
-        ISSUE_URL=$(gh pr view "$PR_NUMBER" --json body --jq '.body' | grep -o 'https://github.com/.*/issues/[0-9]*')
-        if [ -n "$ISSUE_URL" ]; then
-          ISSUE_NUMBER=$(echo $ISSUE_URL | grep -o '[0-9]*$')
-          gh issue edit $ISSUE_NUMBER --add-label "Ready" --remove-label "In-Progress"
-        fi
+     - name: Report build status
+        run: |
+          echo "Build Status: $BUILD_STATUS"
+        env:
+          BUILD_STATUS: ${{ env.BUILD_STATUS }}
