@@ -40,7 +40,7 @@ jobs:
     
         # Find changed Java files
         git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.java$' > ../changed_files.txt
-        echo "Before SHA: ${{ github.event.before }}
+        echo "Before SHA: ${{ github.event.before }}"
         echo "After SHA: ${{ github.sha }}"
         
         # Return to the root directory
