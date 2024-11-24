@@ -1,6 +1,6 @@
 import org.junit.Test;
 import static org.junit.Assert.*;
-public class HelloWorldTest {
+public class LoginPageTest {
     @Test
     public void testOutput() {
         // Simulate the expected output

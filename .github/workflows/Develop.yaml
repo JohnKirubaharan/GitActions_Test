@@ -58,7 +58,7 @@ jobs:
         echo "CHANGED_FILES=$(cat changed_files.txt)" >> $GITHUB_ENV
         echo "Changed files:"
         cat changed_files.txt
-    
+        echo "Build is Complete"
 
         
 #    - name: Get changed Java files in Build Folder
@@ -71,42 +71,42 @@ jobs:
 #        # Return to the root directory
 #        cd ..
 #        echo "CHANGED_FILES=$(cat changed_files.txt)" >> $GITHUB_ENV
+#
+#    - name: Print changed files
+#      run: |
+#        echo "Changed files:"
+#        cat changed_files.txt
 
-    - name: Print changed files
-      run: |
-        echo "Changed files:"
-        cat changed_files.txt
-
-    - name: Build and test changed files
-      if: env.CHANGED_FILES != ''
-      run: |
-          BUILD_STATUS="Pass" # Initialize build status as Pass
-          for file in $(cat changed_files.txt); do
-            echo "Processing $file..."
-            # Change to the Build Folder
-            cd Build || exit
-            # Compile the Java file
-            if ! javac "$file"; then
-              echo "Compilation failed for $file"
-              BUILD_STATUS="Fail"
-              break
-            fi
-            # Extract class name by stripping directory and extension
-            classname=$(basename "$file" .java)
-            # Run the compiled class file
-            if ! java "$classname"; then
-              echo "Execution failed for $classname"
-              BUILD_STATUS="Fail"
-              break
-            fi
-            # Return to the root directory
-            cd ..
-          done
-          echo "BUILD_STATUS=$BUILD_STATUS" >> $GITHUB_ENV
-  
-
-    - name: Report build status
-      run: |
-        echo "Build Status: $BUILD_STATUS"
-      env:
-        BUILD_STATUS: ${{ env.BUILD_STATUS }}
+#    - name: Build and test changed files
+#      if: env.CHANGED_FILES != ''
+#      run: |
+#          BUILD_STATUS="Pass" # Initialize build status as Pass
+#          for file in $(cat changed_files.txt); do
+#            echo "Processing $file..."
+#            # Change to the Build Folder
+#            cd Build || exit
+#            # Compile the Java file
+#            if ! javac "$file"; then
+#              echo "Compilation failed for $file"
+#              BUILD_STATUS="Fail"
+#              break
+#            fi
+#            # Extract class name by stripping directory and extension
+#            classname=$(basename "$file" .java)
+#            # Run the compiled class file
+#            if ! java "$classname"; then
+#              echo "Execution failed for $classname"
+#              BUILD_STATUS="Fail"
+#              break
+#            fi
+#            # Return to the root directory
+#            cd ..
+#          done
+#          echo "BUILD_STATUS=$BUILD_STATUS" >> $GITHUB_ENV
+#  
+#
+#    - name: Report build status
+#      run: |
+#        echo "Build Status: $BUILD_STATUS"
+#      env:
+#        BUILD_STATUS: ${{ env.BUILD_STATUS }}
