@@ -13,12 +13,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Step 2: Auto-label issues based on content
-      - name: Add Labels to Issues
-        uses: actions-ecosystem/action-add-labels@v1
-        with:
-          github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-          labels: ${{ steps.determine-labels.outputs.labels }}
       - name: Determine Labels
         id: determine-labels
         run: |
@@ -58,5 +52,5 @@ jobs:
       - name: Apply Labels to Issue
         uses: actions-ecosystem/action-add-labels@v1
         with:
-          github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           labels: ${{ env.labels }}
