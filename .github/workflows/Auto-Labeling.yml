@@ -53,3 +53,10 @@ jobs:
           # Remove trailing comma and export
           LABELS=${LABELS%,}
           echo "labels=$LABELS" >> $GITHUB_ENV
+
+
+      - name: Apply Labels to Issue
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          github_token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          labels: ${{ env.labels }}
