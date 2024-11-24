@@ -4,6 +4,9 @@ on:
   pull_request:
     branches:
       - develop
+    paths:
+      - 'feature/Build/**'
+      - 'feature/Test/**'
 
 jobs:
   build:
@@ -31,8 +34,8 @@ jobs:
         git fetch --prune --unshallow
     
         # Change to the Build folder if it exists
-        if [ -d Build ]; then
-            cd Build
+        if [ -d "feature/Build" ]; then
+            cd feature/Build
         else
             echo "Build directory does not exist."
             exit 1
@@ -40,20 +43,21 @@ jobs:
     
         # Find changed Java files
         git diff --name-only ${{ github.event.before }} ${{ github.sha }} | grep '\.java$' > ../changed_files.txt
-        echo "Before SHA: ${{ github.event.before }}
+        echo "Before SHA: ${{ github.event.before }}"
         echo "After SHA: ${{ github.sha }}"
         
         # Return to the root directory
-        cd ..
+        cd ../../
     
         # Handle case where no files are found
         if [ ! -s ../changed_files.txt ]; then
             echo "No Java files changed."
             exit 0
         fi
-    
         echo "CHANGED_FILES=$(cat changed_files.txt)" >> $GITHUB_ENV
-    
+        echo "Changed files:"
+        cat changed_files.txt
+        echo "Build is Complete"
 
         
 #    - name: Get changed Java files in Build Folder
@@ -66,42 +70,42 @@ jobs:
 #        # Return to the root directory
 #        cd ..
 #        echo "CHANGED_FILES=$(cat changed_files.txt)" >> $GITHUB_ENV
+#
+#    - name: Print changed files
+#      run: |
+#        echo "Changed files:"
+#        cat changed_files.txt
 
-    - name: Print changed files
-      run: |
-        echo "Changed files:"
-        cat changed_files.txt
-
-    - name: Build and test changed files
-      if: env.CHANGED_FILES != ''
-      run: |
-          BUILD_STATUS="Pass" # Initialize build status as Pass
-          for file in $(cat changed_files.txt); do
-            echo "Processing $file..."
-            # Change to the Build Folder
-            cd Build || exit
-            # Compile the Java file
-            if ! javac "$file"; then
-              echo "Compilation failed for $file"
-              BUILD_STATUS="Fail"
-              break
-            fi
-            # Extract class name by stripping directory and extension
-            classname=$(basename "$file" .java)
-            # Run the compiled class file
-            if ! java "$classname"; then
-              echo "Execution failed for $classname"
-              BUILD_STATUS="Fail"
-              break
-            fi
-            # Return to the root directory
-            cd ..
-          done
-          echo "BUILD_STATUS=$BUILD_STATUS" >> $GITHUB_ENV
-  
-
-    - name: Report build status
-      run: |
-        echo "Build Status: $BUILD_STATUS"
-      env:
-        BUILD_STATUS: ${{ env.BUILD_STATUS }}
+#    - name: Build and test changed files
+#      if: env.CHANGED_FILES != ''
+#      run: |
+#          BUILD_STATUS="Pass" # Initialize build status as Pass
+#          for file in $(cat changed_files.txt); do
+#            echo "Processing $file..."
+#            # Change to the Build Folder
+#            cd Build || exit
+#            # Compile the Java file
+#            if ! javac "$file"; then
+#              echo "Compilation failed for $file"
+#              BUILD_STATUS="Fail"
+#              break
+#            fi
+#            # Extract class name by stripping directory and extension
+#            classname=$(basename "$file" .java)
+#            # Run the compiled class file
+#            if ! java "$classname"; then
+#              echo "Execution failed for $classname"
+#              BUILD_STATUS="Fail"
+#              break
+#            fi
+#            # Return to the root directory
+#            cd ..
+#          done
+#          echo "BUILD_STATUS=$BUILD_STATUS" >> $GITHUB_ENV
+#  
+#
+#    - name: Report build status
+#      run: |
+#        echo "Build Status: $BUILD_STATUS"
+#      env:
+#        BUILD_STATUS: ${{ env.BUILD_STATUS }}
