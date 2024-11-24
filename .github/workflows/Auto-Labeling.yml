@@ -29,19 +29,23 @@ jobs:
           if [[ "$ISSUE_CONTENT" == *"bug"* ]]; then
             LABELS+="bug,"
           fi
+          
           if [[ "$ISSUE_CONTENT" == *"feature"* ]]; then
             LABELS+="enhancement,"
           fi
+          
           if [[ "$ISSUE_CONTENT" == *"docs"* ]]; then
             LABELS+="documentation,"
           fi
+          
           if [[ "$ISSUE_CONTENT" == *"frontend"* ]]; then
             LABELS+="FrontEnd,"
           fi
-          fi
+          
           if [[ "$ISSUE_CONTENT" == *"backend"* ]]; then
             LABELS+="backend,"
           fi
+          
           if [[ "$ISSUE_CONTENT" == *"UI"* ]]; then
             LABELS+="UI,"
           fi
